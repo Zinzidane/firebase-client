@@ -48,16 +48,16 @@ const editDetails = props => {
     // });
   };
   const handleOpen = () => {
-    this.setState({ open: true });
-    this.mapUserDetailsToState(this.props.credentials);
+    setIsOpen(true);
+    mapUserDetailsToState(props.credentials);
   };
   const handleClose = () => {
-    this.setState({ open: false });
+    setIsOpen(false);
   };
 
   useEffect(() => {
     const { credentials } = props;
-    this.mapUserDetailsToState(credentials);
+    mapUserDetailsToState(credentials);
   }, []);
   // componentDidMount() {
   //   const { credentials } = this.props;
@@ -92,7 +92,7 @@ const editDetails = props => {
         <EditIcon color="primary" />
       </MyButton>
       <Dialog
-        open={state.open}
+        open={isOpen}
         onClose={handleClose}
         fullWidth
         maxWidth="sm"
@@ -108,7 +108,7 @@ const editDetails = props => {
               rows="3"
               placeholder="A short bio about yourself"
               className={classes.textField}
-              value={bio}
+              value={details.bio}
               onChange={handleChange}
               fullWidth
             />
@@ -118,7 +118,7 @@ const editDetails = props => {
               label="Website"
               placeholder="Your personal/professinal website"
               className={classes.textField}
-              value={website}
+              value={details.website}
               onChange={handleChange}
               fullWidth
             />
@@ -128,7 +128,7 @@ const editDetails = props => {
               label="Location"
               placeholder="Where you live"
               className={classes.textField}
-              value={location}
+              value={details.location}
               onChange={handleChange}
               fullWidth
             />
