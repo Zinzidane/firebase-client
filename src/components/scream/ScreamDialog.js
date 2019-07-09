@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import withStyles from '@material-ui/core/styles/withStyles';
 import MyButton from '../../util/MyButton';
@@ -47,117 +47,129 @@ const styles = (theme) => ({
   }
 });
 
-class ScreamDialog extends Component {
-  state = {
-    open: false,
+const ScreamDialog = props => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [path, setPath] = useState({
     oldPath: '',
     newPath: ''
-  };
-  componentDidMount() {
-    if (this.props.openDialog) {
-      this.handleOpen();
+  });
+  // state = {
+  //   open: false,
+  //   oldPath: '',
+  //   newPath: ''
+  // };
+
+  useEffect(() => {
+    if (props.openDialog) {
+      handleOpen();
     }
-  }
-  handleOpen = () => {
+  }, []);
+  // componentDidMount() {
+  //   if (this.props.openDialog) {
+  //     this.handleOpen();
+  //   }
+  // }
+  const handleOpen = () => {
     let oldPath = window.location.pathname;
 
-    const { userHandle, screamId } = this.props;
+    const { userHandle, screamId } = props;
     const newPath = `/users/${userHandle}/scream/${screamId}`;
 
     if (oldPath === newPath) oldPath = `/users/${userHandle}`;
 
     window.history.pushState(null, null, newPath);
 
-    this.setState({ open: true, oldPath, newPath });
-    this.props.getScream(this.props.screamId);
+    setIsOpen(true);
+    setPath({oldPath, newPath});
+    // this.setState({ open: true, oldPath, newPath });
+    props.getScream(props.screamId);
   };
-  handleClose = () => {
-    window.history.pushState(null, null, this.state.oldPath);
-    this.setState({ open: false });
-    this.props.clearErrors();
+  const handleClose = () => {
+    window.history.pushState(null, null, path.oldPath);
+    setIsOpen(false);
+    // this.setState({ open: false });
+    props.clearErrors();
   };
 
-  render() {
-    const {
-      classes,
-      scream: {
-        screamId,
-        body,
-        createdAt,
-        likeCount,
-        commentCount,
-        userImage,
-        userHandle,
-        comments
-      },
-      UI: { loading }
-    } = this.props;
+  const {
+    classes,
+    scream: {
+      screamId,
+      body,
+      createdAt,
+      likeCount,
+      commentCount,
+      userImage,
+      userHandle,
+      comments
+    },
+    UI: { loading }
+  } = props;
 
-    const dialogMarkup = loading ? (
-      <div className={classes.spinnerDiv}>
-        <CircularProgress size={200} thickness={2} />
-      </div>
-    ) : (
-      <Grid container spacing={16}>
-        <Grid item sm={5}>
-          <img src={userImage} alt="Profile" className={classes.profileImage} />
-        </Grid>
-        <Grid item sm={7}>
-          <Typography
-            component={Link}
-            color="primary"
-            variant="h5"
-            to={`/users/${userHandle}`}
-          >
-            @{userHandle}
-          </Typography>
-          <hr className={classes.invisibleSeparator} />
-          <Typography variant="body2" color="textSecondary">
-            {dayjs(createdAt).format('h:mm a, MMMM DD YYYY')}
-          </Typography>
-          <hr className={classes.invisibleSeparator} />
-          <Typography variant="body1">{body}</Typography>
-          <LikeButton screamId={screamId} />
-          <span>{likeCount} likes</span>
-          <MyButton tip="comments">
-            <ChatIcon color="primary" />
-          </MyButton>
-          <span>{commentCount} comments</span>
-        </Grid>
-        <hr className={classes.visibleSeparator} />
-        <CommentForm screamId={screamId} />
-        <Comments comments={comments} />
+  const dialogMarkup = loading ? (
+    <div className={classes.spinnerDiv}>
+      <CircularProgress size={200} thickness={2} />
+    </div>
+  ) : (
+    <Grid container spacing={16}>
+      <Grid item sm={5}>
+        <img src={userImage} alt="Profile" className={classes.profileImage} />
       </Grid>
-    );
-    return (
-      <Fragment>
-        <MyButton
-          onClick={this.handleOpen}
-          tip="Expand scream"
-          tipClassName={classes.expandButton}
+      <Grid item sm={7}>
+        <Typography
+          component={Link}
+          color="primary"
+          variant="h5"
+          to={`/users/${userHandle}`}
         >
-          <UnfoldMore color="primary" />
+          @{userHandle}
+        </Typography>
+        <hr className={classes.invisibleSeparator} />
+        <Typography variant="body2" color="textSecondary">
+          {dayjs(createdAt).format('h:mm a, MMMM DD YYYY')}
+        </Typography>
+        <hr className={classes.invisibleSeparator} />
+        <Typography variant="body1">{body}</Typography>
+        <LikeButton screamId={screamId} />
+        <span>{likeCount} likes</span>
+        <MyButton tip="comments">
+          <ChatIcon color="primary" />
         </MyButton>
-        <Dialog
-          open={this.state.open}
-          onClose={this.handleClose}
-          fullWidth
-          maxWidth="sm"
+        <span>{commentCount} comments</span>
+      </Grid>
+      <hr className={classes.visibleSeparator} />
+      <CommentForm screamId={screamId} />
+      <Comments comments={comments} />
+    </Grid>
+  );
+  return (
+    <Fragment>
+      <MyButton
+        onClick={handleOpen}
+        tip="Expand scream"
+        tipClassName={classes.expandButton}
+      >
+        <UnfoldMore color="primary" />
+      </MyButton>
+      <Dialog
+        open={isOpen}
+        onClose={handleClose}
+        fullWidth
+        maxWidth="sm"
+      >
+        <MyButton
+          tip="Close"
+          onClick={handleClose}
+          tipClassName={classes.closeButton}
         >
-          <MyButton
-            tip="Close"
-            onClick={this.handleClose}
-            tipClassName={classes.closeButton}
-          >
-            <CloseIcon />
-          </MyButton>
-          <DialogContent className={classes.dialogContent}>
-            {dialogMarkup}
-          </DialogContent>
-        </Dialog>
-      </Fragment>
-    );
-  }
+          <CloseIcon />
+        </MyButton>
+        <DialogContent className={classes.dialogContent}>
+          {dialogMarkup}
+        </DialogContent>
+      </Dialog>
+    </Fragment>
+  );
 }
 
 ScreamDialog.propTypes = {
