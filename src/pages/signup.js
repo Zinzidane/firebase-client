@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import withStyles from '@material-ui/core/styles/withStyles';
 import PropTypes from 'prop-types';
 import AppIcon from '../images/icon.png';
@@ -18,131 +18,129 @@ const styles = (theme) => ({
   ...theme
 });
 
-class signup extends Component {
-  constructor() {
-    super();
-    this.state = {
-      email: '',
-      password: '',
-      confirmPassword: '',
-      handle: '',
-      errors: {}
-    };
-  }
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.UI.errors) {
-      this.setState({ errors: nextProps.UI.errors });
+const signup = props => {
+  const [credentials, setCredentials] = useState({
+    email: '',
+    password: '',
+    confirmPassword: '',
+    handle: ''
+  });
+
+  const [errors, setErrors] = useState({});
+  // const [isLoading, setIsLoading] = useState(false);
+  useEffect(() => {
+    if (props.UI.errors) {
+      setErrors(props.UI.errors);
     }
-  }
-  handleSubmit = (event) => {
+  }, [props.UI]);
+
+  const handleSubmit = (event) => {
     event.preventDefault();
-    this.setState({
-      loading: true
-    });
+    // setIsLoading(true);
     const newUserData = {
-      email: this.state.email,
-      password: this.state.password,
-      confirmPassword: this.state.confirmPassword,
-      handle: this.state.handle
-    };
-    this.props.signupUser(newUserData, this.props.history);
+      email: credentials.email,
+      password: credentials.password,
+      confirmPassword: credentials.confirmPassword,
+      handle: credentials.handle
+    }
+
+    props.signupUser(newUserData, props.history);
   };
-  handleChange = (event) => {
-    this.setState({
+  const handleChange = (event) => {
+    setCredentials({
+      ...credentials,
       [event.target.name]: event.target.value
     });
-  };
-  render() {
-    const {
-      classes,
-      UI: { loading }
-    } = this.props;
-    const { errors } = this.state;
 
-    return (
-      <Grid container className={classes.form}>
-        <Grid item sm />
-        <Grid item sm>
-          <img src={AppIcon} alt="monkey" className={classes.image} />
-          <Typography variant="h2" className={classes.pageTitle}>
+  };
+  const {
+    classes,
+    UI: { loading }
+  } = props;
+
+  return (
+    <Grid container className={classes.form}>
+      <Grid item sm />
+      <Grid item sm>
+        <img src={AppIcon} alt="monkey" className={classes.image} />
+        <Typography variant="h2" className={classes.pageTitle}>
+          SignUp
+        </Typography>
+        <form noValidate onSubmit={handleSubmit}>
+          <TextField
+            id="email"
+            name="email"
+            type="email"
+            label="Email"
+            className={classes.textField}
+            helperText={errors.email}
+            error={errors.email ? true : false}
+            value={credentials.email}
+            onChange={handleChange}
+            fullWidth
+          />
+          <TextField
+            id="password"
+            name="password"
+            type="password"
+            label="Password"
+            className={classes.textField}
+            helperText={errors.password}
+            error={errors.password ? true : false}
+            value={credentials.password}
+            onChange={handleChange}
+            fullWidth
+          />
+          <TextField
+            id="confirmPassword"
+            name="confirmPassword"
+            type="password"
+            label="Confirm Password"
+            className={classes.textField}
+            helperText={errors.confirmPassword}
+            error={errors.confirmPassword ? true : false}
+            value={credentials.confirmPassword}
+            onChange={handleChange}
+            fullWidth
+          />
+          <TextField
+            id="handle"
+            name="handle"
+            type="text"
+            label="Handle"
+            className={classes.textField}
+            helperText={errors.handle}
+            error={errors.handle ? true : false}
+            value={credentials.handle}
+            onChange={handleChange}
+            fullWidth
+          />
+          {errors.general && (
+            <Typography variant="body2" className={classes.customError}>
+              {errors.general}
+            </Typography>
+          )}
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            className={classes.button}
+            disabled={loading}
+          >
             SignUp
-          </Typography>
-          <form noValidate onSubmit={this.handleSubmit}>
-            <TextField
-              id="email"
-              name="email"
-              type="email"
-              label="Email"
-              className={classes.textField}
-              helperText={errors.email}
-              error={errors.email ? true : false}
-              value={this.state.email}
-              onChange={this.handleChange}
-              fullWidth
-            />
-            <TextField
-              id="password"
-              name="password"
-              type="password"
-              label="Password"
-              className={classes.textField}
-              helperText={errors.password}
-              error={errors.password ? true : false}
-              value={this.state.password}
-              onChange={this.handleChange}
-              fullWidth
-            />
-            <TextField
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              label="Confirm Password"
-              className={classes.textField}
-              helperText={errors.confirmPassword}
-              error={errors.confirmPassword ? true : false}
-              value={this.state.confirmPassword}
-              onChange={this.handleChange}
-              fullWidth
-            />
-            <TextField
-              id="handle"
-              name="handle"
-              type="text"
-              label="Handle"
-              className={classes.textField}
-              helperText={errors.handle}
-              error={errors.handle ? true : false}
-              value={this.state.handle}
-              onChange={this.handleChange}
-              fullWidth
-            />
-            {errors.general && (
-              <Typography variant="body2" className={classes.customError}>
-                {errors.general}
-              </Typography>
+            {loading && (
+              <CircularProgress size={30} className={classes.progress} />
             )}
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              className={classes.button}
-              disabled={loading}
-            >
-              SignUp
-              {loading && (
-                <CircularProgress size={30} className={classes.progress} />
-              )}
-            </Button>
-            <br />
-            <small>
-              Already have an account ? Login <Link to="/login">here</Link>
-            </small>
-          </form>
-        </Grid>
-        <Grid item sm />
+          </Button>
+          <br />
+          <small>
+            Already have an account ? Login <Link to="/login">here</Link>
+          </small>
+        </form>
       </Grid>
-    );
-  }
+      <Grid item sm />
+    </Grid>
+  );
 }
 
 signup.propTypes = {

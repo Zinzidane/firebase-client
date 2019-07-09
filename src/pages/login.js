@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import withStyles from '@material-ui/core/styles/withStyles';
 import PropTypes from 'prop-types';
 import AppIcon from '../images/icon.png';
@@ -18,39 +18,37 @@ const styles = (theme) => ({
   ...theme
 });
 
-class login extends Component {
-  constructor() {
-    super();
-    this.state = {
-      email: '',
-      password: '',
-      errors: {}
-    };
-  }
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.UI.errors) {
-      this.setState({ errors: nextProps.UI.errors });
+const login = props => {
+  const [credentials, setCredentials] = useState({
+    email: '',
+    password: ''
+  });
+  const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    if (props.UI.errors) {
+      setErrors(props.UI.errors);
     }
-  }
-  handleSubmit = (event) => {
+  }, [props.UI.errors]);
+
+  const handleSubmit = (event) => {
     event.preventDefault();
     const userData = {
-      email: this.state.email,
-      password: this.state.password
+      email: credentials.email,
+      password: credentials.password
     };
-    this.props.loginUser(userData, this.props.history);
+    props.loginUser(userData, props.history);
   };
-  handleChange = (event) => {
-    this.setState({
+  const handleChange = (event) => {
+    setCredentials({
+      ...credentials,
       [event.target.name]: event.target.value
     });
   };
-  render() {
     const {
       classes,
       UI: { loading }
-    } = this.props;
-    const { errors } = this.state;
+    } = props;
 
     return (
       <Grid container className={classes.form}>
@@ -60,7 +58,7 @@ class login extends Component {
           <Typography variant="h2" className={classes.pageTitle}>
             Login
           </Typography>
-          <form noValidate onSubmit={this.handleSubmit}>
+          <form noValidate onSubmit={handleSubmit}>
             <TextField
               id="email"
               name="email"
@@ -69,8 +67,8 @@ class login extends Component {
               className={classes.textField}
               helperText={errors.email}
               error={errors.email ? true : false}
-              value={this.state.email}
-              onChange={this.handleChange}
+              value={credentials.email}
+              onChange={handleChange}
               fullWidth
             />
             <TextField
@@ -81,8 +79,8 @@ class login extends Component {
               className={classes.textField}
               helperText={errors.password}
               error={errors.password ? true : false}
-              value={this.state.password}
-              onChange={this.handleChange}
+              value={credentials.password}
+              onChange={handleChange}
               fullWidth
             />
             {errors.general && (
@@ -111,7 +109,6 @@ class login extends Component {
         <Grid item sm />
       </Grid>
     );
-  }
 }
 
 login.propTypes = {
