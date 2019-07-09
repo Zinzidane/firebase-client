@@ -36,11 +36,7 @@ const PostScream = props => {
   const [isOpen, setIsOpen] = useState(false);
   const [body, setBody] = useState('');
   const [errors, setErrors] = useState({});
-  // state = {
-  //   open: false,
-  //   body: '',
-  //   errors: {}
-  // };
+
   useEffect(() => {
     if (props.UI.errors) {
       setErrors(props.UI.errors);
@@ -49,22 +45,11 @@ const PostScream = props => {
       setBody('');
       setIsOpen(false);
       setErrors({});
-      // this.setState({ body: '', open: false, errors: {} });
     }
   }, [props.UI]);
-  // componentWillReceiveProps(nextProps) {
-  //   if (nextProps.UI.errors) {
-  //     this.setState({
-  //       errors: nextProps.UI.errors
-  //     });
-  //   }
-  //   if (!nextProps.UI.errors && !nextProps.UI.loading) {
-  //     this.setState({ body: '', open: false, errors: {} });
-  //   }
-  // }
+
   const handleOpen = () => {
     setIsOpen(true);
-    // this.setState({ open: true });
   };
   const handleClose = () => {
     props.clearErrors();
@@ -73,7 +58,6 @@ const PostScream = props => {
   };
   const handleChange = (event) => {
     setBody(event.target.value);
-    // this.setState({ [event.target.name]: event.target.value });
   };
   const handleSubmit = (event) => {
     event.preventDefault();
