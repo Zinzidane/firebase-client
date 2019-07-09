@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
 import Grid from '@material-ui/core/Grid';
 import PropTypes from 'prop-types';
 
@@ -9,12 +9,15 @@ import ScreamSkeleton from '../util/ScreamSkeleton';
 import { connect } from 'react-redux';
 import { getScreams } from '../redux/actions/dataActions';
 
-class home extends Component {
-  componentDidMount() {
-    this.props.getScreams();
-  }
-  render() {
-    const { screams, loading } = this.props.data;
+const home = props => {
+  useEffect(() => {
+    props.getScreams();
+  }, []);
+  // componentDidMount() {
+  //   this.props.getScreams();
+  // }
+  // render() {
+    const { screams, loading } = props.data;
     let recentScreamsMarkup = !loading ? (
       screams.map((scream) => <Scream key={scream.screamId} scream={scream} />)
     ) : (
@@ -30,7 +33,7 @@ class home extends Component {
         </Grid>
       </Grid>
     );
-  }
+  // }
 }
 
 home.propTypes = {
