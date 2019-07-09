@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import Scream from '../components/scream/Scream';
@@ -11,60 +11,73 @@ import ProfileSkeleton from '../util/ProfileSkeleton';
 import { connect } from 'react-redux';
 import { getUserData } from '../redux/actions/dataActions';
 
-class user extends Component {
-  state = {
-    profile: null,
-    screamIdParam: null
-  };
-  componentDidMount() {
-    const handle = this.props.match.params.handle;
-    const screamId = this.props.match.params.screamId;
+const user = props => {
+  const [profile, setProfile] = useState(null);
+  const [screamIdParam, setScreamIdParam] = useState(null);
+  // state = {
+  //   profile: null,
+  //   screamIdParam: null
+  // };
+  useEffect(() => {
+    const handle = props.match.params.handle;
+    const screamId = props.match.params.screamId;
 
-    if (screamId) this.setState({ screamIdParam: screamId });
+    if (screamId) setScreamIdParam(screamId);
 
-    this.props.getUserData(handle);
+    props.getUserData(handle);
     axios
       .get(`/user/${handle}`)
       .then((res) => {
-        this.setState({
-          profile: res.data.user
-        });
+        setProfile(res.data.user);
       })
       .catch((err) => console.log(err));
-  }
-  render() {
-    const { screams, loading } = this.props.data;
-    const { screamIdParam } = this.state;
+  }, [])
+  // componentDidMount() {
+  //   const handle = this.props.match.params.handle;
+  //   const screamId = this.props.match.params.screamId;
 
-    const screamsMarkup = loading ? (
-      <ScreamSkeleton />
-    ) : screams === null ? (
-      <p>No screams from this user</p>
-    ) : !screamIdParam ? (
-      screams.map((scream) => <Scream key={scream.screamId} scream={scream} />)
-    ) : (
-      screams.map((scream) => {
-        if (scream.screamId !== screamIdParam)
-          return <Scream key={scream.screamId} scream={scream} />;
-        else return <Scream key={scream.screamId} scream={scream} openDialog />;
-      })
-    );
+  //   if (screamId) this.setState({ screamIdParam: screamId });
 
-    return (
-      <Grid container spacing={16}>
-        <Grid item sm={8} xs={12}>
-          {screamsMarkup}
-        </Grid>
-        <Grid item sm={4} xs={12}>
-          {this.state.profile === null ? (
-            <ProfileSkeleton />
-          ) : (
-            <StaticProfile profile={this.state.profile} />
-          )}
-        </Grid>
+  //   this.props.getUserData(handle);
+  //   axios
+  //     .get(`/user/${handle}`)
+  //     .then((res) => {
+  //       this.setState({
+  //         profile: res.data.user
+  //       });
+  //     })
+  //     .catch((err) => console.log(err));
+  // }
+  const { screams, loading } = props.data;
+
+  const screamsMarkup = loading ? (
+    <ScreamSkeleton />
+  ) : screams === null ? (
+    <p>No screams from this user</p>
+  ) : !screamIdParam ? (
+    screams.map((scream) => <Scream key={scream.screamId} scream={scream} />)
+  ) : (
+    screams.map((scream) => {
+      if (scream.screamId !== screamIdParam)
+        return <Scream key={scream.screamId} scream={scream} />;
+      else return <Scream key={scream.screamId} scream={scream} openDialog />;
+    })
+  );
+
+  return (
+    <Grid container spacing={16}>
+      <Grid item sm={8} xs={12}>
+        {screamsMarkup}
       </Grid>
-    );
-  }
+      <Grid item sm={4} xs={12}>
+        {profile === null ? (
+          <ProfileSkeleton />
+        ) : (
+          <StaticProfile profile={profile} />
+        )}
+      </Grid>
+    </Grid>
+  );
 }
 
 user.propTypes = {
